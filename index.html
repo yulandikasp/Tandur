@@ -9,139 +9,136 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <style>
-:root{
-  --bg:#0f172a10;
-  --card:#ffffff;
-  --muted:#64748b;
-  --accent:#0ea5e9;
-  --success:#16a34a;
-  --warn:#f59e0b;
-  --danger:#ef4444;
-  --glass: rgba(255,255,255,0.85);
-  --radius:12px;
-}
-html,body{height:100%}
-body{
-  margin:18px;
-  font-family:Inter,system-ui,Segoe UI,Roboto,"Noto Sans",sans-serif;
-  background:linear-gradient(180deg,#f8fafc 0%, #f1f5f9 100%);
-  color:#0f172a;
-}
-header{display:flex;gap:12px;align-items:center;margin-bottom:10px}
-header h1{margin:0;font-size:20px}
-.top-row{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
-.card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 6px 20px rgba(2,6,23,0.06)}
-.filters{display:flex;gap:12px;align-items:center;flex-wrap:wrap;flex-direction:row;align-content: flex-start;}
-label{font-size:13px;color:var(--muted);display:flex;flex-direction:row;gap:6px;align-items: center;}
-select,multi-select,button{padding:8px 10px;border-radius:10px;border:1px solid #e6eef6;background:transparent;font-size:14px}
-button.primary{background:linear-gradient(90deg,var(--accent),#2563eb);color:white;border:none;box-shadow:0 6px 18px rgba(14,165,233,0.12);cursor:pointer}
-.summary{display:flex;gap:12px;margin:12px 0;flex-wrap:wrap}
-.stat{flex:1;min-width:160px;background:linear-gradient(180deg,#fff,#fbfdff);padding:12px;border-radius:10px;text-align:center}
-.stat .label{font-size:12px;color:var(--muted)}
-.stat .value{font-weight:700;font-size:18px;margin-top:6px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.grid-1{grid-column:1/-1}
-.chart-box{padding:10px;background:var(--card);border-radius:10px}
-canvas{width:auto !important; height:auto !important}
-.small{font-size:14px;color:var(--muted)}
-.dataTables_wrapper .dataTables_paginate .paginate_button{background:transparent;border-radius:6px;padding:6px 10px;border:1px solid transparent}
-.dataTables_wrapper .dataTables_paginate .paginate_button.current{background:linear-gradient(90deg,var(--accent),#2563eb);color:white;border:none}
-table.dataTable thead th{background:#f1f5f9}
-@media (max-width:900px){
-  .grid{grid-template-columns:1fr}
-  canvas{height:260px !important}
-}
-.site-header{display:flex;align-items:center;padding:12px 20px;}
-.site-header .brand-label{margin-left:auto;font-size:16px;font-weight:600;color:#333}
-
-/* Chart center */
-.chart-center {
+  :root{
+    --bg:#0f172a10;
+    --card:#ffffff;
+    --muted:#64748b;
+    --accent:#0ea5e9;
+    --success:#16a34a;
+    --warn:#f59e0b;
+    --danger:#ef4444;
+    --glass: rgba(255,255,255,0.85);
+    --radius:12px;
+  }
+  html,body{height:100%}
+  body{
+    margin:18px; font-family:Inter,system-ui,Segoe UI,Roboto,"Noto Sans",sans-serif;
+    background:linear-gradient(180deg,#f8fafc 0%, #f1f5f9 100%);
+    color:#0f172a;
+  }
+  header{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+  header h1{margin:0;font-size:20px}
+  .top-row{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 6px 20px rgba(2,6,23,0.06)}
+  .filters{display:flex;gap:12px;align-items:center;flex-wrap:wrap;flex-direction:row;align-content: flex-start;}
+  label{font-size:13px;color:var(--muted);display:flex;flex-direction:row;gap:6px;align-items: center;}
+  select,multi-select,button{padding:8px 10px;border-radius:10px;border:1px solid #e6eef6;background:transparent;font-size:14px}
+  button.primary{background:linear-gradient(90deg,var(--accent),#2563eb);color:white;border:none;box-shadow:0 6px 18px rgba(14,165,233,0.12);cursor:pointer}
+  .summary{display:flex;gap:12px;margin:12px 0;flex-wrap:wrap}
+  .stat{flex:1;min-width:160px;background:linear-gradient(180deg,#fff,#fbfdff);padding:12px;border-radius:10px;text-align:center}
+  .stat .label{font-size:12px;color:var(--muted)} .stat .value{font-weight:700;font-size:18px;margin-top:6px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid-1{grid-column:1/-1}
+  .chart-box{padding:10px;background:var(--card);border-radius:10px}
+  canvas{weight: auto !important; height:auto !important}
+  .small{font-size:14px;color:var(--muted)}
+  /* DataTable tweaks */
+  .dataTables_wrapper .dataTables_paginate .paginate_button{background:transparent;border-radius:6px;padding:6px 10px;border:1px solid transparent}
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current{background:linear-gradient(90deg,var(--accent),#2563eb);color:white;border:none}
+  table.dataTable thead th{background:#f1f5f9}
+  @media (max-width:900px){
+    .grid{grid-template-columns:1fr}
+    canvas{height:260px !important}
+  }
+  .site-header {
   display: flex;
-  justify-content: center;
   align-items: center;
+  padding: 12px 20px;
+}
+.site-header .brand-label {
+  margin-left: auto;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
 }
 </style>
 </head>
 <body>
-<header class="site-header">
+  <header class="site-header">
   <img src="Tandur.png" alt="Tandur" width="150" height="auto">
-  <h1 style="display:none;"></h1>
+  <h1 style="display:none;"> </h1>
   <div class="small">Tracking dan Monitoring Ubinan Real Time</div>
   <span class="brand-label">BPS Kabupaten Klaten</span>
 </header>
 
-<div class="card top-row">
-  <div class="filters" style="flex:1">
-    <label>
-      Komoditas
-      <select id="filterCommodity" title="Pilih komoditas">
-        <option value="all">Semua</option>
-        <option value="padi">Padi</option>
-        <option value="palawija">Palawija</option>
-      </select>
-    </label>
-    <label></label>
-    <label>
-      Bulan (pilihan bisa lebih dari 1)
-      <select id="filterMonth" multiple size="4" style="min-width:150px;">
-        <option value="Mei">Mei</option>
-        <option value="Juni">Juni</option>
-        <option value="Juli">Juli</option>
-        <option value="Agustus">Agustus</option>
-      </select>
-    </label>
-  </div>
-  <div style="display:flex;gap:8px;align-self:flex-start">
-    <button id="btnRefresh" class="primary">Muat & Refresh</button>
-    <button id="btnReset">Reset</button>
-  </div>
-</div>
+  <div class="card top-row">
+    <div class="filters" style="flex:1">
+      <label>
+        Komoditas
+        <select id="filterCommodity" title="Pilih komoditas">
+          <option value="all">Semua</option>
+          <option value="padi">Padi</option>
+          <option value="palawija">Palawija</option>
+        </select>
+      </label>
+      <label>  </label>
+      <label>
+        Bulan (pilihan bisa lebih dari 1)
+        <select id="filterMonth" multiple size="4" style="min-width:150px;">
+          <option value="Mei">Mei</option>
+          <option value="Juni">Juni</option>
+          <option value="Juli">Juli</option>
+          <option value="Agustus">Agustus</option>
+        </select>
+      </label>
+    </div>
 
-<div id="summary" class="summary card" aria-live="polite">
-  <div><strong>Ringkasan</strong></div>
-  <div class="stat"><div class="label">Jumlah Sampel Ubinan</div><div id="totalRows" class="value">-</div></div>
-  <div class="stat"><div class="label">Jumlah Sampel Bisa Dilakukan Ubinan</div><div id="pctBisa" class="value">-</div></div>
-  <div class="stat"><div class="label">Jumlah Sampel Gagal Panen / Puso</div><div id="pctGagal" class="value">-</div></div>
-  <div class="stat"><div class="label">Jumlah Sampel Lewat Panen</div><div id="pctLewat" class="value">-</div></div>
-  <div class="stat"><div class="label">Jumlah Sampel Mundur Bulan Berikutnya</div><div id="topHarvest" class="value">-</div></div>
-</div>
+    <div style="display:flex;gap:8px;align-self:flex-start">
+      <button id="btnRefresh" class="primary">Muat & Refresh</button>
+      <button id="btnReset">Reset</button>
+    </div>
+  </div>
 
-<div class="grid">
-  <div class="card chart-box">
-    <h3>Progress Hasil Pengecekan Ubinan</h3>
-    <div class="chart-center">
+  <div id="summary" class="summary card" aria-live="polite">
+    <div style="display:block;justify-content:space-between;align-items:center"><strong>Ringkasan</strong></div>
+    <div class="stat"><div class="label">Jumlah Sampel Ubinan</div><div id="totalRows" class="value">-</div></div>
+    <div class="stat"><div class="label">Jumlah Sampel Bisa Dilakukan Ubinan</div><div id="pctBisa" class="value">-</div></div>
+    <div class="stat"><div class="label">Jumlah Sampel Gagal Panen / Puso</div><div id="pctGagal" class="value">-</div></div>
+    <div class="stat"><div class="label">Jumlah Sampel Lewat Panen</div><div id="pctLewat" class="value">-</div></div>
+    <div class="stat"><div class="label">Jumlah Sampel Mundur Bulan Berikutnya</div><div id="topHarvest" class="value">-</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card chart-box">
+      <h3 style="margin:0 0 8px 0">Progress Hasil Pengecekan Ubinan <script>document.getElementById('filterCommodity').value;</script></h3>
       <canvas id="pieChart" style="max-height:500px;max-width:500px"></canvas>
     </div>
-  </div>
-  <div class="card chart-box">
-    <h3>Progress per Bulan (Jumlah)</h3>
-    <div class="chart-center">
+    <div class="card chart-box">
+      <h3 style="margin:0 0 8px 0">Progress per Bulan (Jumlah)</h3>
       <canvas id="lineChart"></canvas>
     </div>
-  </div>
-  <div class="card grid-1 chart-box">
-    <h3>Progress per PPL</h3>
-    <div class="chart-center">
-      <canvas id="barPPL" style="max-height:500px"></canvas>
+
+    <div class="card grid-1 chart-box">
+      <h3 style="margin:0 0 8px 0">Progress per PPL</h3>
+      <canvas style="max-height:500px" id="barPPL"></canvas>
     </div>
-  </div>
-  <div class="card grid-1 chart-box">
-    <h3>Progress per PML</h3>
-    <div class="chart-center">
+
+    <div class="card grid-1 chart-box">
+      <h3 style="margin:0 0 8px 0">Progress per PML</h3>
       <canvas id="barPML" style="max-height:500px"></canvas>
     </div>
   </div>
-</div>
 
-<div class="card" style="margin-top:12px">
-  <h3>Data Tabel</h3>
-  <table id="dataTable" class="display" style="width:100%;font-size:9pt"><thead></thead><tbody></tbody></table>
-</div>
+  <div class="card" style="margin-top:12px">
+    <h3 style="margin:0 0 10px 0">Data Tabel</h3>
+    <table id="dataTable" class="display" style="width:100%;font-size:9pt"><thead></thead><tbody></tbody></table>
+  </div>
 
 <script>
 /* ============================
