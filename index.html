@@ -36,8 +36,8 @@
   header h1{margin:0;font-size:20px}
   .top-row{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
   .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 6px 20px rgba(2,6,23,0.06)}
-  .filters{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
-  label{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  .filters{display:flex;gap:12px;align-items:center;flex-wrap:wrap;flex-direction:row;align-content: flex-start;}
+  label{font-size:13px;color:var(--muted);display:flex;flex-direction:row;gap:6px}
   select,multi-select,button{padding:8px 10px;border-radius:10px;border:1px solid #e6eef6;background:transparent;font-size:14px}
   button.primary{background:linear-gradient(90deg,var(--accent),#2563eb);color:white;border:none;box-shadow:0 6px 18px rgba(14,165,233,0.12);cursor:pointer}
   .summary{display:flex;gap:12px;margin:12px 0;flex-wrap:wrap}
@@ -97,7 +97,7 @@
     <div class="stat"><div class="label">Jumlah Sampel Bisa Dilakukan Ubinan</div><div id="pctBisa" class="value">-</div></div>
     <div class="stat"><div class="label">Jumlah Sampel Gagal Panen / Puso</div><div id="pctGagal" class="value">-</div></div>
     <div class="stat"><div class="label">Jumlah Sampel Lewat Panen</div><div id="pctLewat" class="value">-</div></div>
-    <div class="stat"><div class="label">Perkiraan bulan panen terbanyak</div><div id="topHarvest" class="value">-</div></div>
+    <div class="stat"><div class="label">Jumlah Sampel Mundur Bulan Berikutnya</div><div id="topHarvest" class="value">-</div></div>
   </div>
 
   <div class="grid">
@@ -371,10 +371,10 @@ async function refresh(){
   // update summary UI
   document.getElementById('totalRows').textContent = s.total;
   const pct = (n) => s.total ? Math.round(100*n/s.total) + '%' : '0%';
-  document.getElementById('pctBisa').textContent = pct(s.counts['Bisa dilakukan ubinan']||0);
-  document.getElementById('pctGagal').textContent = pct(s.counts['Gagal panen/puso']||0);
-  document.getElementById('pctLewat').textContent = pct(s.counts['Lewat panen']||0);
-  document.getElementById('topHarvest').textContent = `${s.topHarvest} (${ s.total? Math.round(100*s.topCount/s.total)+'%':'0%' })`;
+  document.getElementById('pctBisa').textContent = pct(s.counts['Bisa Dilakukan Ubinan']||0);
+  document.getElementById('pctGagal').textContent = pct(s.counts['Gagal Panen/Puso']||0);
+  document.getElementById('pctLewat').textContent = pct(s.counts['Lewat Panen']||0);
+  document.getElementById('topHarvest').textContent = pct(s.counts['Mundur Bulan Berikutnya']||0);
 
   // charts & table
   renderPie(rows);
