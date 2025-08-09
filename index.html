@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Dashboard Ubinan — Modern</title>
+<title>Tandur — Tracking dan Monitoring Ubinan Real Time</title>
 
 <!-- Fonts & libs -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -46,7 +46,7 @@
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .grid-1{grid-column:1/-1}
   .chart-box{padding:10px;background:var(--card);border-radius:10px}
-  canvas{width:100% !important;height:320px !important}
+  canvas{height:100% !important}
   .small{font-size:13px;color:var(--muted)}
   /* DataTable tweaks */
   .dataTables_wrapper .dataTables_paginate .paginate_button{background:transparent;border-radius:6px;padding:6px 10px;border:1px solid transparent}
@@ -60,8 +60,8 @@
 </head>
 <body>
   <header>
-    <h1>📈 Dashboard Ubinan — Modern</h1>
-    <div class="small">Sumber: Google Sheets (CSV) — Chart.js — GitHub Pages</div>
+    <h1><img src="https://drive.google.com/file/d/1fLkHaP8_3s8t500SG2zUaxAjPIpIB9wQ/view?usp=sharing"></img> Tandur</h1>
+    <div class="small">Tracking dan Monitoring Ubinan Real Time</div>
   </header>
 
   <div class="card top-row">
@@ -93,11 +93,11 @@
   </div>
 
   <div id="summary" class="summary card" aria-live="polite">
-    <div class="stat"><div class="label">Jumlah Baris</div><div id="totalRows" class="value">-</div></div>
-    <div class="stat"><div class="label">Bisa dilakukan ubinan</div><div id="pctBisa" class="value">-</div></div>
-    <div class="stat"><div class="label">Gagal panen / puso</div><div id="pctGagal" class="value">-</div></div>
-    <div class="stat"><div class="label">Lewat panen</div><div id="pctLewat" class="value">-</div></div>
-    <div class="stat"><div class="label">Perkiraan panen terbanyak</div><div id="topHarvest" class="value">-</div></div>
+    <div class="stat"><div class="label">Jumlah Sampel Ubinan</div><div id="totalRows" class="value">-</div></div>
+    <div class="stat"><div class="label">Jumlah Sampel Bisa Dilakukan Ubinan</div><div id="pctBisa" class="value">-</div></div>
+    <div class="stat"><div class="label">Jumlah Sampel Gagal Panen / Puso</div><div id="pctGagal" class="value">-</div></div>
+    <div class="stat"><div class="label">Jumlah Sampel Lewat Panen</div><div id="pctLewat" class="value">-</div></div>
+    <div class="stat"><div class="label">Perkiraan bulan panen terbanyak</div><div id="topHarvest" class="value">-</div></div>
   </div>
 
   <div class="grid">
