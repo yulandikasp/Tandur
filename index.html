@@ -37,7 +37,7 @@
   .top-row{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
   .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 6px 20px rgba(2,6,23,0.06)}
   .filters{display:flex;gap:12px;align-items:center;flex-wrap:wrap;flex-direction:row;align-content: flex-start;}
-  label{font-size:13px;color:var(--muted);display:flex;flex-direction:row;gap:6px}
+  label{font-size:13px;color:var(--muted);display:flex;flex-direction:row;gap:6px;align-items: center;}
   select,multi-select,button{padding:8px 10px;border-radius:10px;border:1px solid #e6eef6;background:transparent;font-size:14px}
   button.primary{background:linear-gradient(90deg,var(--accent),#2563eb);color:white;border:none;box-shadow:0 6px 18px rgba(14,165,233,0.12);cursor:pointer}
   .summary{display:flex;gap:12px;margin:12px 0;flex-wrap:wrap}
@@ -47,7 +47,7 @@
   .grid-1{grid-column:1/-1}
   .chart-box{padding:10px;background:var(--card);border-radius:10px}
   canvas{weight: auto !important; height:auto !important}
-  .small{font-size:13px;color:var(--muted)}
+  .small{font-size:14px;color:var(--muted)}
   /* DataTable tweaks */
   .dataTables_wrapper .dataTables_paginate .paginate_button{background:transparent;border-radius:6px;padding:6px 10px;border:1px solid transparent}
   .dataTables_wrapper .dataTables_paginate .paginate_button.current{background:linear-gradient(90deg,var(--accent),#2563eb);color:white;border:none}
@@ -60,7 +60,7 @@
 </head>
 <body>
   <header>
-    <img src="Tandur.png" alt="Tandur" style="width: 150px; height: auto;"><h1> Tandur</h1>
+    <img src="Tandur.png" alt="Tandur" style="width: 150px; height: auto;"><h1> </h1>
     <div class="small">Tracking dan Monitoring Ubinan Real Time</div>
   </header>
 
@@ -93,6 +93,7 @@
   </div>
 
   <div id="summary" class="summary card" aria-live="polite">
+    <div style="display:flex;justify-content:space-between;align-items:center"><strong>Ringkasan</strong><span class="muted"> otomatis dari data</span></div>
     <div class="stat"><div class="label">Jumlah Sampel Ubinan</div><div id="totalRows" class="value">-</div></div>
     <div class="stat"><div class="label">Jumlah Sampel Bisa Dilakukan Ubinan</div><div id="pctBisa" class="value">-</div></div>
     <div class="stat"><div class="label">Jumlah Sampel Gagal Panen / Puso</div><div id="pctGagal" class="value">-</div></div>
@@ -102,8 +103,8 @@
 
   <div class="grid">
     <div class="card chart-box">
-      <h3 style="margin:0 0 8px 0">Proporsi Pengecekan Ubinan</h3>
-      <canvas id="pieChart"></canvas>
+      <h3 style="margin:0 0 8px 0">Progress Hasil Pengecekan Ubinan <script>document.getElementById('filterCommodity').value;</script></h3>
+      <canvas id="pieChart" style="max-height:500px;max-width:500px"></canvas>
     </div>
     <div class="card chart-box">
       <h3 style="margin:0 0 8px 0">Progress per Bulan (Jumlah)</h3>
@@ -112,12 +113,12 @@
 
     <div class="card grid-1 chart-box">
       <h3 style="margin:0 0 8px 0">Progress per PPL</h3>
-      <canvas id="barPPL"></canvas>
+      <canvas style="max-height:500px" id="barPPL"></canvas>
     </div>
 
     <div class="card grid-1 chart-box">
       <h3 style="margin:0 0 8px 0">Progress per PML</h3>
-      <canvas id="barPML"></canvas>
+      <canvas id="barPML" style="max-height:500px"></canvas>
     </div>
   </div>
 
