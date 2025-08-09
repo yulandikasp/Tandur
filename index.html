@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Interaktif</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard Interaktif</h1>
+        <div class="filters">
+            <select id="komoditasFilter">
+                <option value="all">Semua Komoditas</option>
+                <option value="padi">Padi</option>
+                <option value="palawija">Palawija</option>
+                <option value="padi_palawija">Padi & Palawija</option>
+            </select>
+            <select id="bulanFilter">
+                <option value="all">Semua Bulan</option>
+                <option value="Mei">Mei</option>
+                <option value="Juni">Juni</option>
+                <option value="Juli">Juli</option>
+                <option value="Agustus">Agustus</option>
+            </select>
+        </div>
+        <div class="summary" id="summary"></div>
+        <div class="chart-row">
+            <canvas id="pieChart"></canvas>
+            <canvas id="lineChart"></canvas>
+        </div>
+        <div class="chart-row">
+            <canvas id="barChartPPL"></canvas>
+        </div>
+        <div class="chart-row">
+            <canvas id="barChartPML"></canvas>
+        </div>
+        <div class="table-container">
+            <table id="dataTable">
+                <thead>
+                    <tr id="tableHead"></tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div id="pagination"></div>
+        </div>
+    </div>
+    <script src="dataConfig.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
