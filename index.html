@@ -46,7 +46,7 @@
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .grid-1{grid-column:1/-1}
   .chart-box{padding:10px;background:var(--card);border-radius:10px}
-  canvas{height:80% !important}
+  canvas{weight: auto !important; height:auto !important}
   .small{font-size:13px;color:var(--muted)}
   /* DataTable tweaks */
   .dataTables_wrapper .dataTables_paginate .paginate_button{background:transparent;border-radius:6px;padding:6px 10px;border:1px solid transparent}
@@ -60,7 +60,7 @@
 </head>
 <body>
   <header>
-    <img src="https://drive.google.com/uc?export=view&id=1fLkHaP8_3s8t500SG2zUaxAjPIpIB9wQ" alt="Tandur"></img><h1> Tandur</h1>
+    <img src="https://drive.google.com/uc?export=view&id=1fLkHaP8_3s8t500SG2zUaxAjPIpIB9wQ" alt="Tandur" style="width: 150px; height: auto;">><h1> Tandur</h1>
     <div class="small">Tracking dan Monitoring Ubinan Real Time</div>
   </header>
 
@@ -143,13 +143,13 @@ const sheetSources = [
 ];
 
 // canonical categories & colors
-const categoryOrder = ['Bisa dilakukan ubinan','Lewat panen','Gagal panen/puso','(blank)','Mundur bulan berikutnya'];
+const categoryOrder = ['Bisa Dilakukan Ubinan','Lewat Panen','Gagal Panen/Puso','Mundur Bulan Berikutnya','(blank)'];
 const colors = {
-  'Bisa dilakukan ubinan':'#06b6d4',
-  'Lewat panen':'#f59e0b',
-  'Gagal panen/puso':'#ef4444',
+  'Bisa Dilakukan Ubinan':'#06b6d4',
+  'Lewat Panen':'#f59e0b',
+  'Gagal Panen/Puso':'#ef4444',
+  'Mundur Bulan Berikutnya':'#10b981',
   '(blank)':'#94a3b8',
-  'Mundur bulan berikutnya':'#10b981'
 };
 
 /* ============================
@@ -163,10 +163,10 @@ function normalizeCategory(raw){
   if(raw==null) return '(blank)';
   const t = String(raw).trim().toLowerCase();
   if(t==='') return '(blank)';
-  if(t.includes('bisa')) return 'Bisa dilakukan ubinan';
-  if(t.includes('lewat')) return 'Lewat panen';
-  if(t.includes('gagal') || t.includes('puso')) return 'Gagal panen/puso';
-  if(t.includes('mundur')) return 'Mundur bulan berikutnya';
+  if(t.includes('bisa')) return 'Bisa Dilakukan Ubinan';
+  if(t.includes('lewat')) return 'Lewat Panen';
+  if(t.includes('gagal') || t.includes('puso')) return 'Gagal Panen/Puso';
+  if(t.includes('mundur')) return 'Mundur Bulan Berikutnya';
   return raw.trim();
 }
 
