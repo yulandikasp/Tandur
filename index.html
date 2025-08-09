@@ -1,40 +1,409 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Interaktif</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard Ubinan — Modern</title>
+
+<!-- Fonts & libs -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<style>
+  :root{
+    --bg:#0f172a10;
+    --card:#ffffff;
+    --muted:#64748b;
+    --accent:#0ea5e9;
+    --success:#16a34a;
+    --warn:#f59e0b;
+    --danger:#ef4444;
+    --glass: rgba(255,255,255,0.85);
+    --radius:12px;
+  }
+  html,body{height:100%}
+  body{
+    margin:18px; font-family:Inter,system-ui,Segoe UI,Roboto,"Noto Sans",sans-serif;
+    background:linear-gradient(180deg,#f8fafc 0%, #f1f5f9 100%);
+    color:#0f172a;
+  }
+  header{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+  header h1{margin:0;font-size:20px}
+  .top-row{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 6px 20px rgba(2,6,23,0.06)}
+  .filters{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+  label{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  select,multi-select,button{padding:8px 10px;border-radius:10px;border:1px solid #e6eef6;background:transparent;font-size:14px}
+  button.primary{background:linear-gradient(90deg,var(--accent),#2563eb);color:white;border:none;box-shadow:0 6px 18px rgba(14,165,233,0.12);cursor:pointer}
+  .summary{display:flex;gap:12px;margin:12px 0;flex-wrap:wrap}
+  .stat{flex:1;min-width:160px;background:linear-gradient(180deg,#fff,#fbfdff);padding:12px;border-radius:10px;text-align:center}
+  .stat .label{font-size:12px;color:var(--muted)} .stat .value{font-weight:700;font-size:18px;margin-top:6px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid-1{grid-column:1/-1}
+  .chart-box{padding:10px;background:var(--card);border-radius:10px}
+  canvas{width:100% !important;height:320px !important}
+  .small{font-size:13px;color:var(--muted)}
+  /* DataTable tweaks */
+  .dataTables_wrapper .dataTables_paginate .paginate_button{background:transparent;border-radius:6px;padding:6px 10px;border:1px solid transparent}
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current{background:linear-gradient(90deg,var(--accent),#2563eb);color:white;border:none}
+  table.dataTable thead th{background:#f1f5f9}
+  @media (max-width:900px){
+    .grid{grid-template-columns:1fr}
+    canvas{height:260px !important}
+  }
+</style>
 </head>
 <body>
-    <div class="filters">
-        <label for="filterKomoditas">Komoditas:</label>
-        <select id="filterKomoditas"></select>
+  <header>
+    <h1>📈 Dashboard Ubinan — Modern</h1>
+    <div class="small">Sumber: Google Sheets (CSV) — Chart.js — GitHub Pages</div>
+  </header>
 
-        <label for="filterBulan">Bulan:</label>
-        <select id="filterBulan"></select>
+  <div class="card top-row">
+    <div class="filters" style="flex:1">
+      <label>
+        Komoditas
+        <select id="filterCommodity" title="Pilih komoditas">
+          <option value="all">Semua</option>
+          <option value="padi">Padi</option>
+          <option value="palawija">Palawija</option>
+        </select>
+      </label>
+
+      <label>
+        Bulan (multi)
+        <select id="filterMonth" multiple size="4" style="min-width:150px;">
+          <option value="Mei">Mei</option>
+          <option value="Juni">Juni</option>
+          <option value="Juli">Juli</option>
+          <option value="Agustus">Agustus</option>
+        </select>
+      </label>
     </div>
-    <div class="summary" id="summary"></div>
-    <div class="charts">
-        <div class="chart-row">
-            <canvas id="pieChart"></canvas>
-            <canvas id="lineChart"></canvas>
-        </div>
-        <div class="chart-row">
-            <canvas id="barChartPPL"></canvas>
-        </div>
-        <div class="chart-row">
-            <canvas id="barChartPML"></canvas>
-        </div>
+
+    <div style="display:flex;gap:8px;align-self:flex-start">
+      <button id="btnRefresh" class="primary">Muat & Refresh</button>
+      <button id="btnReset">Reset</button>
     </div>
-    <div class="table-container">
-        <table id="dataTable">
-            <thead></thead>
-            <tbody></tbody>
-        </table>
-        <div id="pagination"></div>
+  </div>
+
+  <div id="summary" class="summary card" aria-live="polite">
+    <div class="stat"><div class="label">Jumlah Baris</div><div id="totalRows" class="value">-</div></div>
+    <div class="stat"><div class="label">Bisa dilakukan ubinan</div><div id="pctBisa" class="value">-</div></div>
+    <div class="stat"><div class="label">Gagal panen / puso</div><div id="pctGagal" class="value">-</div></div>
+    <div class="stat"><div class="label">Lewat panen</div><div id="pctLewat" class="value">-</div></div>
+    <div class="stat"><div class="label">Perkiraan panen terbanyak</div><div id="topHarvest" class="value">-</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card chart-box">
+      <h3 style="margin:0 0 8px 0">Proporsi Pengecekan Ubinan</h3>
+      <canvas id="pieChart"></canvas>
     </div>
-    <script src="script.js"></script>
+    <div class="card chart-box">
+      <h3 style="margin:0 0 8px 0">Progress per Bulan (Jumlah)</h3>
+      <canvas id="lineChart"></canvas>
+    </div>
+
+    <div class="card grid-1 chart-box">
+      <h3 style="margin:0 0 8px 0">Grouped Bar — per PPL</h3>
+      <canvas id="barPPL"></canvas>
+    </div>
+
+    <div class="card grid-1 chart-box">
+      <h3 style="margin:0 0 8px 0">Grouped Bar — per PML</h3>
+      <canvas id="barPML"></canvas>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <h3 style="margin:0 0 10px 0">Data Tabel</h3>
+    <table id="dataTable" class="display" style="width:100%"><thead></thead><tbody></tbody></table>
+  </div>
+
+<script>
+/* ============================
+   Configuration (edit here)
+   ============================ */
+const baseCsv = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSWCkd_KYVxdPoZ_5d4df-tqUTLFsiD2V5KWg8b68KqaVKhZLVXVkSOyHktPGzJpH6wfE_8kfDTJRlF/pub?output=csv&gid=';
+const sheetSources = [
+  { name:'Padi Mei',    gid:'1153765034', type:'padi', month:'Mei' },
+  { name:'Padi Juni',   gid:'529738358',  type:'padi', month:'Juni' },
+  { name:'Padi Juli',   gid:'1951480158', type:'padi', month:'Juli' },
+  { name:'Padi Agustus',gid:'895245660',  type:'padi', month:'Agustus' },
+  { name:'Palawija Mei',    gid:'2108318717', type:'palawija', month:'Mei' },
+  { name:'Palawija Juni',   gid:'1446893873', type:'palawija', month:'Juni' },
+  { name:'Palawija Juli',   gid:'1370597324', type:'palawija', month:'Juli' },
+  { name:'Palawija Agustus',gid:'84564269',   type:'palawija', month:'Agustus' }
+];
+
+// canonical categories & colors
+const categoryOrder = ['Bisa dilakukan ubinan','Lewat panen','Gagal panen/puso','(blank)','Mundur bulan berikutnya'];
+const colors = {
+  'Bisa dilakukan ubinan':'#06b6d4',
+  'Lewat panen':'#f59e0b',
+  'Gagal panen/puso':'#ef4444',
+  '(blank)':'#94a3b8',
+  'Mundur bulan berikutnya':'#10b981'
+};
+
+/* ============================
+   Utilities & state
+   ============================ */
+const cached = {}; // sheetName -> rows array
+let charts = {};   // store Chart.js instances
+let dt = null;     // DataTable instance
+
+function normalizeCategory(raw){
+  if(raw==null) return '(blank)';
+  const t = String(raw).trim().toLowerCase();
+  if(t==='') return '(blank)';
+  if(t.includes('bisa')) return 'Bisa dilakukan ubinan';
+  if(t.includes('lewat')) return 'Lewat panen';
+  if(t.includes('gagal') || t.includes('puso')) return 'Gagal panen/puso';
+  if(t.includes('mundur')) return 'Mundur bulan berikutnya';
+  return raw.trim();
+}
+
+function findKeyBySubstr(obj, substr){
+  substr = substr.toLowerCase();
+  for(const k of Object.keys(obj)){
+    if(k.toLowerCase().includes(substr)) return k;
+  }
+  return null;
+}
+
+/* ============================
+   Data loading
+   ============================ */
+async function fetchCsvByGid(gid){
+  return new Promise((resolve,reject)=>{
+    Papa.parse(baseCsv + gid, {
+      download: true, header: true, skipEmptyLines: true,
+      complete: res => resolve(res.data),
+      error: err => reject(err)
+    });
+  });
+}
+
+async function loadAll(){
+  // fetch all sheets (concurrently)
+  const promises = sheetSources.map(s => fetchCsvByGid(s.gid).then(rows => ({...s, rows})).catch(e => ({...s, rows:[]}) ));
+  const results = await Promise.all(promises);
+  results.forEach(r => {
+    cached[r.name] = (r.rows || []).map(row => {
+      row.__sheet = r.name; row.__type = r.type; row.__month = r.month; return row;
+    });
+  });
+}
+
+/* ============================
+   Filter & data combine
+   ============================ */
+function getSelectedMonths(){
+  const sel = document.getElementById('filterMonth');
+  return Array.from(sel.selectedOptions).map(o => o.value);
+}
+
+function combineRows(){
+  const commodity = document.getElementById('filterCommodity').value;
+  const months = getSelectedMonths();
+  let combined = [];
+  for(const s of sheetSources){
+    if(!(s.name in cached)) continue;
+    if(commodity !== 'all' && s.type !== commodity) continue;
+    if(months.length>0 && !months.includes(s.month)) continue;
+    combined = combined.concat(cached[s.name]);
+  }
+  return combined;
+}
+
+/* ============================
+   Summaries
+   ============================ */
+function summarize(rows){
+  const total = rows.length;
+  const counts = {}; categoryOrder.forEach(c=>counts[c]=0);
+  const harvestFreq = {};
+  for(const r of rows){
+    const pengeKey = findKeyBySubstr(r, 'pengecekan');
+    const penge = pengeKey ? r[pengeKey] : '';
+    const cat = normalizeCategory(penge);
+    counts[cat] = (counts[cat]||0) + 1;
+    const phKey = findKeyBySubstr(r, 'perkiraan');
+    const ph = phKey ? String(r[phKey]).trim() : '(blank)';
+    harvestFreq[ph] = (harvestFreq[ph]||0) + 1;
+  }
+  let topHarvest='(tidak ada)', topCount=0;
+  for(const k in harvestFreq) if(harvestFreq[k]>topCount){ topCount=harvestFreq[k]; topHarvest=k; }
+  return { total, counts, harvestFreq, topHarvest, topCount };
+}
+
+/* ============================
+   Charts rendering
+   ============================ */
+function renderPie(rows){
+  const counts = {}; categoryOrder.forEach(c=>counts[c]=0);
+  rows.forEach(r => {
+    const pengeKey = findKeyBySubstr(r,'pengecekan');
+    const cat = normalizeCategory(pengeKey? r[pengeKey] : '');
+    counts[cat] = (counts[cat]||0) + 1;
+  });
+  const labels = categoryOrder.filter(c=>counts[c]>0);
+  const data = labels.map(l=>counts[l]);
+  const bg = labels.map(l=>colors[l] || '#888');
+
+  if(charts.pie) charts.pie.destroy();
+  charts.pie = new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: { labels, datasets: [{ data, backgroundColor: bg, hoverOffset: 12, borderColor:'#fff', borderWidth:2 }]},
+    options: {
+      plugins: {
+        legend: { position:'bottom', labels:{boxWidth:12,padding:12} },
+        tooltip: { callbacks:{ label: ctx => `${ctx.label}: ${ctx.raw} (${Math.round((ctx.raw/ (data.reduce((a,b)=>a+b,0)||1))*100)}%)`}}
+      },
+      animation:{easing:'easeOutQuart',duration:700}
+    }
+  });
+}
+
+function renderLine(rows){
+  const months = ['Mei','Juni','Juli','Agustus'];
+  const series = {}; categoryOrder.forEach(c=> series[c] = months.map(()=>0));
+  rows.forEach(r => {
+    const m = r.__month;
+    const mi = months.indexOf(m);
+    if(mi < 0) return;
+    const pengeKey = findKeyBySubstr(r,'pengecekan');
+    const cat = normalizeCategory(pengeKey? r[pengeKey] : '');
+    series[cat][mi] = (series[cat][mi] || 0) + 1;
+  });
+
+  const datasets = categoryOrder.map(c=>({
+    label:c,
+    data: series[c],
+    borderColor: colors[c],
+    backgroundColor: (colors[c] || '#444') + '33',
+    tension:0.28,
+    pointRadius:4,
+    pointHoverRadius:6,
+    fill: true
+  }));
+
+  if(charts.line) charts.line.destroy();
+  charts.line = new Chart(document.getElementById('lineChart'), {
+    type:'line',
+    data:{ labels: months, datasets },
+    options:{
+      responsive:true,
+      plugins:{ legend:{position:'bottom'}, tooltip:{mode:'index',intersect:false} },
+      scales:{ y:{ beginAtZero:true, ticks:{precision:0} } }
+    }
+  });
+}
+
+function renderGroupedBar(rows, fieldGuess, canvasId){
+  // detect column name (PPL / PML) from example row
+  const sample = rows.length ? rows[0] : null;
+  let keyName = fieldGuess;
+  if(sample){
+    const found = Object.keys(sample).find(k => k.toLowerCase().includes(fieldGuess.toLowerCase()));
+    if(found) keyName = found;
+  }
+  const groups = {};
+  rows.forEach(r => {
+    const g = String(r[keyName] || '(blank)');
+    const penge = normalizeCategory(findKeyBySubstr(r,'pengecekan') ? r[findKeyBySubstr(r,'pengecekan')] : '');
+    groups[g] = groups[g] || {}; categoryOrder.forEach(c=> groups[g][c] = groups[g][c] || 0);
+    groups[g][penge] = (groups[g][penge]||0) + 1;
+  });
+
+  const labels = Object.keys(groups).sort();
+  const datasets = categoryOrder.map(c=>({
+    label: c,
+    data: labels.map(l => groups[l][c] || 0),
+    backgroundColor: colors[c],
+    stack: undefined
+  }));
+
+  if(charts[canvasId]) charts[canvasId].destroy();
+  charts[canvasId] = new Chart(document.getElementById(canvasId), {
+    type:'bar',
+    data:{ labels, datasets },
+    options:{
+      responsive:true,
+      plugins:{ legend:{position:'bottom'} },
+      scales:{ x:{ stacked:false }, y:{ beginAtZero:true, ticks:{precision:0}} },
+      interaction:{ mode:'nearest', axis:'x' },
+      animation:{ duration:700, easing:'easeOutQuart' }
+    }
+  });
+}
+
+/* ============================
+   Table rendering
+   ============================ */
+function renderTable(rows){
+  // destroy previous
+  if($.fn.DataTable.isDataTable('#dataTable')){ $('#dataTable').DataTable().clear().destroy(); $('#dataTable thead').empty(); $('#dataTable tbody').empty(); }
+  if(!rows.length){ $('#dataTable thead').html('<tr><th>(no data)</th></tr>'); return; }
+  const keys = Object.keys(rows[0]).filter(k=> !k.startsWith('__'));
+  const thead = '<tr>' + keys.map(k=>`<th>${k}</th>`).join('') + '</tr>';
+  $('#dataTable thead').html(thead);
+  const data = rows.map(r => keys.map(k => r[k]||''));
+  dt = $('#dataTable').DataTable({ data, columns: keys.map(k=>({ title:k })), pageLength:10, lengthChange:false, searching:true });
+}
+
+/* ============================
+   Full render pipeline
+   ============================ */
+async function refresh(){
+  // ensure loaded
+  if(Object.keys(cached).length === 0) await loadAll();
+
+  const rows = combineRows();
+  const s = summarize(rows);
+  // update summary UI
+  document.getElementById('totalRows').textContent = s.total;
+  const pct = (n) => s.total ? Math.round(100*n/s.total) + '%' : '0%';
+  document.getElementById('pctBisa').textContent = pct(s.counts['Bisa dilakukan ubinan']||0);
+  document.getElementById('pctGagal').textContent = pct(s.counts['Gagal panen/puso']||0);
+  document.getElementById('pctLewat').textContent = pct(s.counts['Lewat panen']||0);
+  document.getElementById('topHarvest').textContent = `${s.topHarvest} (${ s.total? Math.round(100*s.topCount/s.total)+'%':'0%' })`;
+
+  // charts & table
+  renderPie(rows);
+  renderLine(rows);
+  renderGroupedBar(rows, 'ppl', 'barPPL');
+  renderGroupedBar(rows, 'pml', 'barPML');
+  renderTable(rows);
+}
+
+/* ============================
+   Initialization
+   ============================ */
+document.getElementById('btnRefresh').addEventListener('click', refresh);
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  document.getElementById('filterCommodity').value = 'all';
+  const sel = document.getElementById('filterMonth');
+  Array.from(sel.options).forEach(o => o.selected = true);
+  refresh();
+});
+
+// auto load: fetch sheets then set default months all selected and render
+(async ()=>{
+  await loadAll();
+  // select all months by default to avoid empty result
+  const monthSelect = document.getElementById('filterMonth');
+  Array.from(monthSelect.options).forEach(o=> o.selected = true);
+  // if user wants initial commodity preselected, change here (default all)
+  refresh();
+})();
+</script>
 </body>
 </html>
